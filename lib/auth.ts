@@ -30,10 +30,11 @@ export const auth = {
 
   // Sign in with Google
   async signInWithGoogle() {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard`,
+        redirectTo: `${baseUrl}/dashboard`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -74,8 +75,9 @@ export const auth = {
 
   // Reset password
   async resetPassword(email: string) {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000')
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`,
+      redirectTo: `${baseUrl}/auth/reset-password`,
     })
     return { data, error }
   },
