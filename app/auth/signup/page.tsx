@@ -11,8 +11,11 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, MapPin, Briefcase } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, MapPin, Briefcase, AlertCircle } from "lucide-react"
 import Link from "next/link"
+import { africanCountries, professions } from "@/data"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -28,101 +31,59 @@ export default function SignUpPage() {
     agreeToTerms: false,
     subscribeNewsletter: true,
   })
-
-  const africanCountries = [
-    "Algeria",
-    "Angola",
-    "Benin",
-    "Botswana",
-    "Burkina Faso",
-    "Burundi",
-    "Cameroon",
-    "Cape Verde",
-    "Central African Republic",
-    "Chad",
-    "Comoros",
-    "Congo",
-    "Democratic Republic of Congo",
-    "Djibouti",
-    "Egypt",
-    "Equatorial Guinea",
-    "Eritrea",
-    "Eswatini",
-    "Ethiopia",
-    "Gabon",
-    "Gambia",
-    "Ghana",
-    "Guinea",
-    "Guinea-Bissau",
-    "Ivory Coast",
-    "Kenya",
-    "Lesotho",
-    "Liberia",
-    "Libya",
-    "Madagascar",
-    "Malawi",
-    "Mali",
-    "Mauritania",
-    "Mauritius",
-    "Morocco",
-    "Mozambique",
-    "Namibia",
-    "Niger",
-    "Nigeria",
-    "Rwanda",
-    "São Tomé and Príncipe",
-    "Senegal",
-    "Seychelles",
-    "Sierra Leone",
-    "Somalia",
-    "South Africa",
-    "South Sudan",
-    "Sudan",
-    "Tanzania",
-    "Togo",
-    "Tunisia",
-    "Uganda",
-    "Zambia",
-    "Zimbabwe",
-    "None African",
-  ]
-
-  const professions = [
-    "Software Developer",
-    "Data Scientist",
-    "Product Manager",
-    "UX/UI Designer",
-    "Digital Marketer",
-    "Business Analyst",
-    "Project Manager",
-    "DevOps Engineer",
-    "Cybersecurity Specialist",
-    "AI/ML Engineer",
-    "Mobile Developer",
-    "Full Stack Developer",
-    "Backend Developer",
-    "Frontend Developer",
-    "QA Engineer",
-    "Sales Professional",
-    "Marketing Manager",
-    "Content Creator",
-    "Graphic Designer",
-    "Entrepreneur",
-    "Consultant",
-    "Financial Analyst",
-    "HR Professional",
-    "Operations Manager",
-    "Other",
-  ]
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+  const { signUp, signInWithGoogle } = useAuth();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    setError("")
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log("Form submitted:", formData)
+    setLoading(true)
+    setError("")
+
+    // Validate password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match")
+      setLoading(false)
+      return
+    }
+
+    // Validate required fields
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      setError("Please fill in all required fields")
+      setLoading(false)
+      return
+    }
+
+    // Call signUp function with user data
+    const userData = {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      email: formData.email,
+      location: formData.country,
+      role: formData.profession,
+    }
+
+    const { error } = await signUp(formData.email, formData.password, userData)
+
+    if (error) {
+      setError(error.message)
+    }
+
+    setLoading(false)
+  }
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true)
+    const { error } = await signInWithGoogle()
+    if (error) {
+      setError(error.message)
+    }
+    setLoading(false)
   }
 
   return (
@@ -163,6 +124,13 @@ export default function SignUpPage() {
           </CardHeader>
 
           <CardContent>
+            {error && (
+              <Alert className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-red-700 dark:text-red-300">{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-4">
@@ -354,9 +322,9 @@ export default function SignUpPage() {
               <Button
                 type="submit"
                 className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold py-3"
-                disabled={!formData.agreeToTerms}
+                disabled={!formData.agreeToTerms || loading}
               >
-                Create My Account
+                {loading ? "Creating Account..." : "Create My Account"}
               </Button>
 
               {/* Divider */}
@@ -373,6 +341,8 @@ export default function SignUpPage() {
                   type="button"
                   variant="outline"
                   className="w-full border-orange-200 dark:border-slate-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 bg-transparent"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
                 >
                   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                     <path
@@ -393,16 +363,6 @@ export default function SignUpPage() {
                     />
                   </svg>
                   Continue with Google
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full border-orange-200 dark:border-slate-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 bg-transparent"
-                >
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                  </svg>
-                  Continue with Facebook
                 </Button>
               </div>
 

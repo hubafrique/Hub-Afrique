@@ -1,3 +1,4 @@
+import { TUser } from "@/types"
 import { supabase } from "./supabase"
 import type { User } from "@supabase/supabase-js"
 
@@ -5,13 +6,13 @@ export type AuthUser = User | null
 
 export const auth = {
   // Sign up with email and password
-  async signUp(email: string, password: string, fullName: string) {
+  async signUp(email: string, password: string, userData: Partial<TUser>) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: fullName,
+          ...userData
         },
       },
     })
@@ -33,6 +34,10 @@ export const auth = {
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     })
     return { data, error }

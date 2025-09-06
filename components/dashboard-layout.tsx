@@ -39,6 +39,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
 
 const navigation = [
   {
@@ -79,11 +80,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [notifications, setNotifications] = useState(3)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
+  const { user, profile, signOut } = useAuth()
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false)
   }, [pathname])
+
+  // Fix logout button to handle async signOut properly
+  const handleSignOut = async () => {
+    await signOut()
+  }
 
   // Handle responsive behavior
   useEffect(() => {
@@ -112,9 +119,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Sidebar */}
         <aside
-          className={`${isCollapsed ? "w-16" : "w-60"} ${
-            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-          } fixed md:relative z-50 h-full transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0`}
+          className={`${isCollapsed ? "w-16" : "w-60"} ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+            } fixed md:relative z-50 h-full transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0`}
         >
           {/* Sidebar Header */}
           <div className="p-4 border-b border-slate-200 dark:border-slate-700">
@@ -180,18 +186,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                               <TooltipTrigger asChild>
                                 <Link
                                   href={item.url}
-                                  className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors group ${
-                                    isActive
-                                      ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
-                                      : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                                  }`}
+                                  className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors group ${isActive
+                                    ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
+                                    : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
+                                    }`}
                                 >
                                   <item.icon
-                                    className={`h-5 w-5 ${
-                                      isActive
-                                        ? "text-orange-600 dark:text-orange-400"
-                                        : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                    }`}
+                                    className={`h-5 w-5 ${isActive
+                                      ? "text-orange-600 dark:text-orange-400"
+                                      : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
+                                      }`}
                                   />
                                 </Link>
                               </TooltipTrigger>
@@ -202,25 +206,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                           ) : (
                             <Link
                               href={item.url}
-                              className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group ${
-                                isActive
-                                  ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
-                                  : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                              }`}
+                              className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group ${isActive
+                                ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
+                                : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
+                                }`}
                             >
                               <item.icon
-                                className={`h-5 w-5 shrink-0 ${
-                                  isActive
-                                    ? "text-orange-600 dark:text-orange-400"
-                                    : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                }`}
+                                className={`h-5 w-5 shrink-0 ${isActive
+                                  ? "text-orange-600 dark:text-orange-400"
+                                  : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
+                                  }`}
                               />
                               <span
-                                className={`text-sm font-medium truncate ${
-                                  isActive
-                                    ? "text-orange-600 dark:text-orange-400"
-                                    : "text-slate-700 dark:text-slate-300 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                }`}
+                                className={`text-sm font-medium truncate ${isActive
+                                  ? "text-orange-600 dark:text-orange-400"
+                                  : "text-slate-700 dark:text-slate-300 group-hover:text-orange-600 dark:group-hover:text-orange-400"
+                                  }`}
                               >
                                 {item.title}
                               </span>
@@ -258,21 +259,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className={`${
-                    isCollapsed ? "w-10 h-10 p-0" : "w-full justify-start"
-                  } hover:bg-orange-100 dark:hover:bg-orange-900/20`}
+                  className={`${isCollapsed ? "w-10 h-10 p-0" : "w-full justify-start"
+                    } hover:bg-orange-100 dark:hover:bg-orange-900/20`}
                 >
                   <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="John Doe" />
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
                     <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm">
-                      JD
+                      {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   {!isCollapsed && (
                     <>
                       <div className="ml-3 text-left flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">John Doe</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">john@example.com</p>
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                          {profile?.full_name || user?.user_metadata?.full_name || "User"}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
                       </div>
                       <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
                     </>
@@ -282,8 +284,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">
+                      {profile?.full_name || user?.user_metadata?.full_name || "User"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -300,7 +304,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   Help
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -360,9 +364,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="John Doe" />
+                      <AvatarImage src={user?.user_metadata?.avatar_url} />
                       <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
-                        JD
+                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -370,8 +374,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">John Doe</p>
-                      <p className="text-xs text-muted-foreground">john@example.com</p>
+                      <p className="text-sm font-medium">
+                        {profile?.full_name || user?.user_metadata?.full_name || "User"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -384,7 +390,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                   </DropdownMenuItem>

@@ -4,7 +4,8 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -34,12 +35,18 @@ import {
   Instagram,
   Linkedin,
   Twitter,
+  User,
+  Settings,
+  LogOut,
+  Bell,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, profile, signOut } = useAuth()
 
   const stats = [
     { label: "Active Professionals", value: "50,000+", icon: <Users className="w-6 h-6" /> },
@@ -201,18 +208,72 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Auth Buttons */}
+            {/* Auth Section */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="ghost" className="hover:bg-orange-50 dark:hover:bg-orange-900/20">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/signup">
-                <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
-                  Get Started
-                </Button>
-              </Link>
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <Button variant="ghost" size="icon" className="hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                    <Bell className="h-5 w-5" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="flex items-center space-x-2 hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.user_metadata?.avatar_url} />
+                          <AvatarFallback>
+                            {profile?.full_name?.charAt(0) || user.email?.charAt(0) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium">
+                          {profile?.full_name || user.user_metadata?.full_name || "User"}
+                        </span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <div className="flex items-center justify-start gap-2 p-2">
+                        <div className="flex flex-col space-y-1 leading-none">
+                          <p className="font-medium">{profile?.full_name || user.user_metadata?.full_name}</p>
+                          <p className="w-[200px] truncate text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard" className="flex items-center">
+                          <User className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/profile" className="flex items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Profile Settings
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => signOut()} className="flex items-center text-red-600">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ) : (
+                <>
+                  <Link href="/auth/signin">
+                    <Button variant="ghost" className="hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/auth/signup">
+                    <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -264,16 +325,54 @@ export default function HomePage() {
                 </Link>
 
                 <div className="flex flex-col space-y-2 px-4">
-                  <Link href="/auth/signin">
-                    <Button variant="outline" className="w-full bg-transparent">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/auth/signup">
-                    <Button className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
-                      Get Started
-                    </Button>
-                  </Link>
+                  {user ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2 p-2 border rounded-lg">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.user_metadata?.avatar_url} />
+                          <AvatarFallback>
+                            {profile?.full_name?.charAt(0) || user.email?.charAt(0) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">
+                            {profile?.full_name || user.user_metadata?.full_name || "User"}
+                          </span>
+                          <span className="text-xs text-slate-500">{user.email}</span>
+                        </div>
+                      </div>
+                      <Link href="/dashboard">
+                        <Button variant="outline" className="w-full">
+                          Dashboard
+                        </Button>
+                      </Link>
+                      <Link href="/profile">
+                        <Button variant="outline" className="w-full">
+                          Profile Settings
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="w-full text-red-600 hover:text-red-700"
+                        onClick={() => signOut()}
+                      >
+                        Sign Out
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Link href="/auth/signin">
+                        <Button variant="outline" className="w-full bg-transparent">
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link href="/auth/signup">
+                        <Button className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+                          Get Started
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
