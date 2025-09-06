@@ -91,10 +91,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await auth.signIn(email, password)
-    if (!error) {
+    const { data, error } = await auth.signIn(email, password)
+    if (!error && data?.session) {
+      // Set user and profile state
+      setUser(data.session.user)
+      await loadProfile(data.session.user.id)
+
       // Check profile completeness before redirecting
-      const { data: profileData } = await database.profiles.getProfile(user?.id || "")
+      const { data: profileData } = await database.profiles.getProfile(data.session.user.id)
       if (profileData) {
         // Profile exists, check if it's complete
         if (!profileData.location || !profileData.role) {
