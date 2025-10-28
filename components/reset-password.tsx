@@ -1,3 +1,5 @@
+"use client"
+
 import { auth } from "@/lib/auth"
 import { Label } from "@/components/ui/label"
 import { AlertCircle, CheckCircle, EyeOff, Eye, Lock } from "lucide-react"
