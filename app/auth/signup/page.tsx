@@ -10,11 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, MapPin, Briefcase, AlertCircle } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { africanCountries, professions } from "@/data"
 import { useAuth } from "@/hooks/use-auth"
 
 export default function SignUpPage() {
@@ -26,8 +24,6 @@ export default function SignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    country: "",
-    profession: "",
     agreeToTerms: false,
     subscribeNewsletter: true,
   })
@@ -61,11 +57,8 @@ export default function SignUpPage() {
 
     // Call signUp function with user data
     const userData = {
-      first_name: formData.firstName,
-      last_name: formData.lastName,
+      full_name: `${formData.firstName} ${formData.lastName}`,
       email: formData.email,
-      location: formData.country,
-      role: formData.profession,
     }
 
     const { error } = await signUp(formData.email, formData.password, userData)
@@ -189,49 +182,7 @@ export default function SignUpPage() {
                 </div>
               </div>
 
-              {/* Country */}
-              <div className="space-y-2">
-                <Label htmlFor="country" className="text-sm font-medium">
-                  Country
-                </Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                  <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
-                    <SelectTrigger className="pl-10 border-orange-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500">
-                      <SelectValue placeholder="Select your country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {africanCountries.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
-              {/* Profession */}
-              <div className="space-y-2">
-                <Label htmlFor="profession" className="text-sm font-medium">
-                  Profession
-                </Label>
-                <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                  <Select value={formData.profession} onValueChange={(value) => handleInputChange("profession", value)}>
-                    <SelectTrigger className="pl-10 border-orange-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500">
-                      <SelectValue placeholder="Select your profession" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {professions.map((profession) => (
-                        <SelectItem key={profession} value={profession}>
-                          {profession}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
               {/* Password */}
               <div className="space-y-2">

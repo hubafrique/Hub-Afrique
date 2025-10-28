@@ -13,10 +13,10 @@ export const metadata: Metadata = {
     "Launch your professional journey - The ultimate African network connecting professionals at every stage of their career journey across the continent.",
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/images/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/images/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   generator: "v0.dev",
 }

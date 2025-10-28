@@ -39,6 +39,9 @@ export default function SignInPage() {
 
     if (error) {
       setError(error.message)
+      if (error.message === "Email not confirmed") {
+        setError("Please verify your email before signing in.")
+      }
     }
 
     setLoading(false)

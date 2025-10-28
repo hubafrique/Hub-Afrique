@@ -1,18 +1,21 @@
 import { TUser } from "@/types"
-import { supabase } from "./supabase"
+import { Profile, supabase } from "./supabase"
 import type { User } from "@supabase/supabase-js"
 
 export type AuthUser = User | null
 
 export const auth = {
   // Sign up with email and password
-  async signUp(email: string, password: string, userData: Partial<TUser>) {
+  async signUp(email: string, password: string, userData: Partial<Profile>) {
+    console.log(email, password, userData);
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          ...userData
+          ...userData,
+          role: 'learner',
         },
       },
     })
@@ -87,6 +90,17 @@ export const auth = {
     const { data, error } = await supabase.auth.updateUser({
       password,
     })
+    return { data, error }
+  },
+
+  // Resend confirmation email
+  async resendConfirmation(email: string) {
+    const { data, error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    })
+    console.log(data);
+
     return { data, error }
   },
 }

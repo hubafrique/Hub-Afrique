@@ -19,6 +19,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
+  resendConfirmation: (email: string) => Promise<{ error: any }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -49,6 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         setUser(session.user)
         await loadProfile(session.user.id)
+
+        // Check email confirmation first
+        if (!session.user.email_confirmed_at) {
+          router.push("/auth/verify-email")
+          return
+        }
 
         // Check if profile exists and is complete
         const { data: profileData } = await database.profiles.getProfile(session.user.id)
@@ -110,18 +117,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Profile doesn't exist, redirect to onboarding
         router.push("/auth/signup/onboarding")
       }
+    } else if (error) {
+      // Check if error is due to unconfirmed email
+      if (error.message?.includes("Email not confirmed") || error.message?.includes("email_not_confirmed")) {
+        // Store email in localStorage for security instead of URL params
+        localStorage.setItem('unconfirmedEmail', email)
+        router.push('/auth/verify-email')
+        return { error: null }
+      }
     }
     return { error }
   }
 
-  const signUp = async (email: string, password: string, userData: Partial<TUser>) => {
+  const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
     const { data, error } = await auth.signUp(email, password, userData);
     if (!error && data?.user) {
       // Create profile in profiles table with additional data
+      console.log(data.user);
+
       const profileData = {
         id: data.user.id,
-        location: userData.country || "",
-        role: userData.profession as "learner" | "mentor" | "recruiter" | undefined,
+        location: "",
+        profession: undefined,
       }
       const { error: profileError } = await database.profiles.updateProfile(data.user.id, profileData)
       if (profileError) {
@@ -146,11 +163,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error("No user logged in") }
+    console.log(user);
 
-    const { data, error } = await database.profiles.updateProfile(user.id, updates)
+
+    const { data, error } = await database.profiles.updateProfile(user.id, updates as Profile)
     if (data) {
       setProfile(data)
     }
+    return { error }
+  }
+
+  const resendConfirmation = async (email: string) => {
+    const { error } = await auth.resendConfirmation(email)
     return { error }
   }
 
@@ -163,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signOut,
     updateProfile,
+    resendConfirmation,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

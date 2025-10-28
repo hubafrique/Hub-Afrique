@@ -14,10 +14,12 @@ import { useAuth } from "@/hooks/use-auth"
 
 export default function Onboarding() {
     const router = useRouter()
-    const { profile, updateProfile } = useAuth()
+    const { profile, updateProfile, user } = useAuth()
+
+    console.log("Profile: ", profile);
 
     const [formData, setFormData] = useState({
-        country: profile?.location || "",
+        location: profile?.location || "",
         profession: profile?.role || "",
     })
 
@@ -33,7 +35,7 @@ export default function Onboarding() {
         // Map profession to role type expected by Profile type
         // Assuming role can be "learner" for all onboarding users by default
         const updates = {
-            location: formData.country,
+            ...formData,
             role: "learner" as "learner" | "mentor" | "recruiter",
         }
         const { error } = await updateProfile(updates)
@@ -83,7 +85,7 @@ export default function Onboarding() {
                                 </Label>
                                 <div className="relative">
                                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
-                                    <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
+                                    <Select value={formData.location} onValueChange={(value) => handleInputChange("location", value)}>
                                         <SelectTrigger className="pl-10 border-orange-200 dark:border-slate-600 focus:border-orange-500 focus:ring-orange-500">
                                             <SelectValue placeholder="Select your country" />
                                         </SelectTrigger>
