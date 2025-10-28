@@ -1,6 +1,3 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret-here';
-
 -- Create custom types
 CREATE TYPE user_role AS ENUM ('learner', 'mentor', 'recruiter');
 CREATE TYPE prolab_status AS ENUM ('not_started', 'in_progress', 'completed');

@@ -5,11 +5,12 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
+export type { User } from "@supabase/supabase-js"
+
 // Types for our database
 export type Profile = {
   id: string
-  full_name: string
-  email: string
+  profession: string
   role: "learner" | "mentor" | "recruiter"
   prolab_status: "not_started" | "in_progress" | "completed"
   profile_picture?: string

@@ -18,6 +18,11 @@ export const database = {
       const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false })
       return { data, error }
     },
+
+    async createProfile(profile: Omit<Profile, "id" | "created_at">) {
+      const { data, error } = await supabase.from("profiles").insert(profile).select().single()
+      return { data, error }
+    },
   },
 
   // Course operations
