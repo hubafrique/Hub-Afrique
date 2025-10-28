@@ -132,18 +132,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
     const { data, error } = await auth.signUp(email, password, userData);
     if (!error && data?.user) {
-      // Create profile in profiles table with additional data
-      console.log(data.user);
-
-      const profileData = {
-        id: data.user.id,
-        location: "",
-        profession: undefined,
-      }
-      const { error: profileError } = await database.profiles.updateProfile(data.user.id, profileData)
-      if (profileError) {
-        return { error: profileError }
-      }
       router.push("/auth/verify-email")
     }
     return { error }
