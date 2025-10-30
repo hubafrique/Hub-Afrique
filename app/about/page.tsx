@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import {
   ArrowRight,
   Users,
@@ -13,13 +12,8 @@ import {
   TrendingUp,
   BookOpen,
   Briefcase,
-  Facebook,
-  Instagram,
-  Linkedin,
-  Twitter,
 } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 
 export default function AboutPage() {
   return (
@@ -300,138 +294,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Company Info */}
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <Image
-                  src="/images/hub-afrique-logo.png"
-                  alt="Hub Afrique Logo"
-                  width={32}
-                  height={32}
-                  className="brightness-110 contrast-125"
-                />
-                <span className="text-lg font-bold bg-gradient-to-r from-orange-400 to-blue-400 bg-clip-text text-transparent">
-                  Hub Afrique
-                </span>
-              </div>
-              <p className="text-slate-400 mb-4">
-                Empowering African professionals through innovative learning and networking solutions.
-              </p>
-              <div className="flex space-x-4">
-                <Link
-                  href="https://facebook.com/hapnethq"
-                  className="text-slate-400 hover:text-orange-400 transition-colors"
-                >
-                  <Facebook className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="https://instagram.com/hapnethq"
-                  className="text-slate-400 hover:text-orange-400 transition-colors"
-                >
-                  <Instagram className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="https://linkedin.com/company/hapnet"
-                  className="text-slate-400 hover:text-orange-400 transition-colors"
-                >
-                  <Linkedin className="w-5 h-5" />
-                </Link>
-                <Link href="https://x.com/hapnet" className="text-slate-400 hover:text-orange-400 transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Platform */}
-            <div>
-              <h3 className="font-semibold mb-4">Platform</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="/prolab" className="hover:text-orange-400 transition-colors">
-                    ProLab
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ihub" className="hover:text-orange-400 transition-colors">
-                    iHub
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/prohub" className="hover:text-orange-400 transition-colors">
-                    ProHub
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="/about" className="hover:text-orange-400 transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/careers" className="hover:text-orange-400 transition-colors">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="hover:text-orange-400 transition-colors">
-                    Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/partnership" className="hover:text-orange-400 transition-colors">
-                    Partnership
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h3 className="font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-slate-400">
-                <li>
-                  <Link href="/help" className="hover:text-orange-400 transition-colors">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-orange-400 transition-colors">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/privacy" className="hover:text-orange-400 transition-colors">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/terms" className="hover:text-orange-400 transition-colors">
-                    Terms
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <Separator className="bg-slate-700 mb-8" />
-
-          <div className="flex flex-col md:flex-row justify-between items-center text-slate-400">
-            <p>&copy; 2024 Hub Afrique. All rights reserved.</p>
-            <p className="mt-2 md:mt-0">Made with ❤️ for African professionals</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

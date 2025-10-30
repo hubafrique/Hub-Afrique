@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -34,12 +34,10 @@ import {
   ChevronDown,
   Moon,
   Sun,
-  Menu,
-  X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
 
 const navigation = [
   {
@@ -76,91 +74,42 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [notifications, setNotifications] = useState(3)
   const { theme, setTheme } = useTheme()
-  const pathname = usePathname()
-  const { user, profile, signOut } = useAuth()
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsMobileMenuOpen(false)
-  }, [pathname])
-
-  // Fix logout button to handle async signOut properly
-  const handleSignOut = async () => {
-    await signOut()
-  }
-
-  // Handle responsive behavior
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setIsCollapsed(false)
-        setIsMobileMenuOpen(false)
-      }
-    }
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
-
-  const isActiveRoute = (url: string) => {
-    return pathname === url
-  }
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-background overflow-hidden">
-        {/* Mobile Overlay */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
-        )}
-
+      <div className="flex h-screen bg-background">
         {/* Sidebar */}
         <aside
-          className={`${isCollapsed ? "w-16" : "w-60"} ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-            } fixed md:relative z-50 h-full transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col shrink-0`}
+          className={`${isCollapsed ? "w-16" : "w-60"
+            } transition-all duration-300 ease-in-out bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col`}
         >
           {/* Sidebar Header */}
           <div className="p-4 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3 min-w-0">
+              <div className="flex items-center space-x-3">
                 <img
                   src="/images/hub-afrique-logo.png"
                   alt="Hub Afrique Logo"
-                  className="w-[52px] h-[52px] shrink-0 object-contain dark:brightness-110 dark:contrast-125"
+                  className="w-8 h-8 dark:brightness-110 dark:contrast-125"
                 />
                 {!isCollapsed && (
-                  <div className="min-w-0 flex-1">
-                    <span className="text-lg font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-blue-600 bg-clip-text text-transparent block truncate">
+                  <div>
+                    <span className="text-lg font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-blue-600 bg-clip-text text-transparent">
                       Hub Afrique
                     </span>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 truncate">Professional Network</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">Professional Network</p>
                   </div>
                 )}
               </div>
-
-              {/* Desktop Toggle Button */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 hover:bg-orange-100 dark:hover:bg-orange-900/20 shrink-0 hidden md:flex"
+                className="h-8 w-8 hover:bg-orange-100 dark:hover:bg-orange-900/20"
                 onClick={() => setIsCollapsed(!isCollapsed)}
               >
-                <Menu className="h-4 w-4" />
+                {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
                 <span className="sr-only">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</span>
-              </Button>
-
-              {/* Mobile Close Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 hover:bg-orange-100 dark:hover:bg-orange-900/20 shrink-0 md:hidden"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close menu</span>
               </Button>
             </div>
           </div>
@@ -176,60 +125,35 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </h3>
                   )}
                   <div className="space-y-1">
-                    {group.items.map((item) => {
-                      const isActive = isActiveRoute(item.url)
-
-                      return (
-                        <div key={item.title}>
-                          {isCollapsed ? (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Link
-                                  href={item.url}
-                                  className={`flex items-center justify-center h-10 w-10 rounded-lg transition-colors group ${isActive
-                                    ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
-                                    : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                                    }`}
-                                >
-                                  <item.icon
-                                    className={`h-5 w-5 ${isActive
-                                      ? "text-orange-600 dark:text-orange-400"
-                                      : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                      }`}
-                                  />
-                                </Link>
-                              </TooltipTrigger>
-                              <TooltipContent side="right">
-                                <p>{item.title}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          ) : (
-                            <Link
-                              href={item.url}
-                              className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors group ${isActive
-                                ? "bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400"
-                                : "hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                                }`}
-                            >
-                              <item.icon
-                                className={`h-5 w-5 shrink-0 ${isActive
-                                  ? "text-orange-600 dark:text-orange-400"
-                                  : "text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                  }`}
-                              />
-                              <span
-                                className={`text-sm font-medium truncate ${isActive
-                                  ? "text-orange-600 dark:text-orange-400"
-                                  : "text-slate-700 dark:text-slate-300 group-hover:text-orange-600 dark:group-hover:text-orange-400"
-                                  }`}
+                    {group.items.map((item) => (
+                      <div key={item.title}>
+                        {isCollapsed ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Link
+                                href={item.url}
+                                className="flex items-center justify-center h-10 w-10 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors group"
                               >
-                                {item.title}
-                              </span>
-                            </Link>
-                          )}
-                        </div>
-                      )
-                    })}
+                                <item.icon className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400" />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              <p>{item.title}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Link
+                            href={item.url}
+                            className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors group"
+                          >
+                            <item.icon className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-orange-600 dark:group-hover:text-orange-400" />
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                              {item.title}
+                            </span>
+                          </Link>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -241,12 +165,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     Appearance
                   </h3>
                   <div className="flex items-center space-x-3 px-3 py-2">
-                    <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400 shrink-0" />
+                    <Sun className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                     <Switch
                       checked={theme === "dark"}
                       onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
                     />
-                    <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400 shrink-0" />
+                    <Moon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                   </div>
                 </div>
               )}
@@ -262,21 +186,19 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   className={`${isCollapsed ? "w-10 h-10 p-0" : "w-full justify-start"
                     } hover:bg-orange-100 dark:hover:bg-orange-900/20`}
                 >
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="John Doe" />
                     <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm">
-                      {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                      JD
                     </AvatarFallback>
                   </Avatar>
                   {!isCollapsed && (
                     <>
-                      <div className="ml-3 text-left flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                          {profile?.full_name || user?.user_metadata?.full_name || "User"}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
+                      <div className="ml-3 text-left flex-1">
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300">John Doe</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">john@example.com</p>
                       </div>
-                      <ChevronDown className="h-4 w-4 text-slate-400 shrink-0" />
+                      <ChevronDown className="h-4 w-4 text-slate-400" />
                     </>
                   )}
                 </Button>
@@ -284,10 +206,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">
-                      {profile?.full_name || user?.user_metadata?.full_name || "User"}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    <p className="text-sm font-medium">John Doe</p>
+                    <p className="text-xs text-muted-foreground">john@example.com</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -304,7 +224,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   Help
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
+                <DropdownMenuItem>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -314,21 +234,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Bar */}
-          <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0">
-            <div className="flex items-center space-x-4 min-w-0">
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden hover:bg-orange-100 dark:hover:bg-orange-900/20"
-                onClick={() => setIsMobileMenuOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-
+          <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6">
+            <div className="flex items-center space-x-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
@@ -339,7 +248,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4 shrink-0">
+            <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
                 size="icon"
@@ -353,20 +262,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
               <Button variant="ghost" size="icon" className="relative hover:bg-orange-100 dark:hover:bg-orange-900/20">
                 <Bell className="h-4 w-4" />
-                {notifications > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 dark:bg-red-600 text-white font-bold border-2 border-background flex items-center justify-center">
-                    {notifications}
-                  </Badge>
-                )}
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs bg-red-500 dark:bg-red-600 text-white font-bold border-2 border-background flex items-center justify-center">
+                  3
+                </Badge>
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} />
+                      <AvatarImage src="/placeholder.svg?height=32&width=32" alt="John Doe" />
                       <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
-                        {profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
+                        JD
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -374,10 +281,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <DropdownMenuContent className="w-56" align="end">
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">
-                        {profile?.full_name || user?.user_metadata?.full_name || "User"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                      <p className="text-sm font-medium">John Doe</p>
+                      <p className="text-xs text-muted-foreground">john@example.com</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
@@ -390,7 +295,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     Settings
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>
+                  <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                   </DropdownMenuItem>
