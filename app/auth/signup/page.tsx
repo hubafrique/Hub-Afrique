@@ -84,6 +84,7 @@ export default function SignUpPage() {
     "Uganda",
     "Zambia",
     "Zimbabwe",
+    "None African",
   ]
 
   const professions = [

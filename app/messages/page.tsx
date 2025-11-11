@@ -7,7 +7,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { MessageCircle, Search, Send, Phone, Video, MoreVertical, Paperclip, Smile, Plus } from "lucide-react"
+import {
+  MessageCircle,
+  Search,
+  Send,
+  Phone,
+  Video,
+  MoreVertical,
+  Paperclip,
+  Smile,
+  Plus,
+  ArrowLeft,
+} from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
 
 export default function MessagesPage() {
@@ -172,15 +183,17 @@ export default function MessagesPage() {
 
   return (
     <DashboardLayout>
-      <div className="h-[calc(100vh-8rem)] flex bg-white rounded-lg border border-slate-200 overflow-hidden">
+      <div className="h-[calc(100vh-6rem)] sm:h-[calc(100vh-8rem)] flex flex-col sm:flex-row bg-white rounded-lg border border-slate-200 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-80 border-r border-slate-200 flex flex-col">
+        <div
+          className={`${selectedChat ? "hidden sm:flex" : "flex"} w-full sm:w-80 border-r border-slate-200 flex-col`}
+        >
           {/* Header */}
-          <div className="p-4 border-b border-slate-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-slate-900">Messages</h2>
-              <Button size="icon" variant="ghost">
-                <Plus className="w-5 h-5" />
+          <div className="p-3 sm:p-4 border-b border-slate-200">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-lg sm:text-xl font-semibold text-slate-900">Messages</h2>
+              <Button size="icon" variant="ghost" className="w-8 h-8 sm:w-10 sm:h-10">
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </div>
             <div className="relative">
@@ -189,26 +202,26 @@ export default function MessagesPage() {
                 placeholder="Search conversations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm sm:text-base"
               />
             </div>
           </div>
 
           {/* Conversations List */}
           <ScrollArea className="flex-1">
-            <div className="p-2">
+            <div className="p-1 sm:p-2">
               {filteredConversations.map((conversation) => (
                 <div
                   key={conversation.id}
                   onClick={() => setSelectedChat(conversation.id)}
-                  className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-colors ${
                     selectedChat === conversation.id ? "bg-orange-50 border border-orange-200" : "hover:bg-slate-50"
                   }`}
                 >
                   <div className="relative">
-                    <Avatar className="w-12 h-12">
+                    <Avatar className="w-10 h-10 sm:w-12 sm:h-12">
                       <AvatarImage src={conversation.avatar || "/placeholder.svg"} alt={conversation.name} />
-                      <AvatarFallback>
+                      <AvatarFallback className="text-xs sm:text-sm">
                         {conversation.name
                           .split(" ")
                           .map((n) => n[0])
@@ -216,17 +229,17 @@ export default function MessagesPage() {
                       </AvatarFallback>
                     </Avatar>
                     {conversation.online && (
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 border-white rounded-full"></div>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-medium text-slate-900 truncate">{conversation.name}</h3>
-                      <span className="text-xs text-slate-500">{conversation.timestamp}</span>
+                      <h3 className="font-medium text-slate-900 truncate text-sm sm:text-base">{conversation.name}</h3>
+                      <span className="text-xs text-slate-500 shrink-0">{conversation.timestamp}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-slate-600 truncate flex-1">{conversation.lastMessage}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 truncate flex-1">{conversation.lastMessage}</p>
                       {conversation.unread > 0 && (
                         <Badge className="ml-2 bg-orange-500 text-white text-xs">{conversation.unread}</Badge>
                       )}
@@ -244,20 +257,28 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
+        <div className={`${selectedChat ? "flex" : "hidden sm:flex"} flex-1 flex-col`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 border-b border-slate-200 bg-white">
+              <div className="p-3 sm:p-4 border-b border-slate-200 bg-white">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="sm:hidden w-8 h-8"
+                      onClick={() => setSelectedChat(null)}
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
                     <div className="relative">
-                      <Avatar className="w-10 h-10">
+                      <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                         <AvatarImage
                           src={selectedConversation.avatar || "/placeholder.svg"}
                           alt={selectedConversation.name}
                         />
-                        <AvatarFallback>
+                        <AvatarFallback className="text-xs sm:text-sm">
                           {selectedConversation.name
                             .split(" ")
                             .map((n) => n[0])
@@ -265,49 +286,54 @@ export default function MessagesPage() {
                         </AvatarFallback>
                       </Avatar>
                       {selectedConversation.online && (
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                        <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 border-2 border-white rounded-full"></div>
                       )}
                     </div>
-                    <div>
-                      <h3 className="font-medium text-slate-900">{selectedConversation.name}</h3>
-                      <p className="text-sm text-slate-600">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-slate-900 text-sm sm:text-base truncate">
+                        {selectedConversation.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 truncate">
                         {selectedConversation.online ? "Online" : "Last seen 2 hours ago"}
                       </p>
                     </div>
-                    <Badge variant="secondary" className={`${getTypeColor(selectedConversation.type)}`}>
+                    <Badge
+                      variant="secondary"
+                      className={`${getTypeColor(selectedConversation.type)} text-xs hidden sm:inline-flex`}
+                    >
                       {getTypeIcon(selectedConversation.type)} {selectedConversation.role}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="icon">
-                      <Phone className="w-5 h-5" />
+                  <div className="flex items-center space-x-1 sm:space-x-2">
+                    <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10">
+                      <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
-                    <Button variant="ghost" size="icon">
-                      <Video className="w-5 h-5" />
+                    <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10">
+                      <Video className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="w-5 h-5" />
+                    <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10">
+                      <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                   </div>
                 </div>
               </div>
 
               {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
+              <ScrollArea className="flex-1 p-3 sm:p-4">
+                <div className="space-y-3 sm:space-y-4">
                   {messages.map((message) => (
                     <div key={message.id} className={`flex ${message.isOwn ? "justify-end" : "justify-start"}`}>
                       <div
-                        className={`flex items-end space-x-2 max-w-xs lg:max-w-md ${message.isOwn ? "flex-row-reverse space-x-reverse" : ""}`}
+                        className={`flex items-end space-x-2 max-w-[85%] sm:max-w-xs lg:max-w-md ${message.isOwn ? "flex-row-reverse space-x-reverse" : ""}`}
                       >
                         {!message.isOwn && (
-                          <Avatar className="w-8 h-8">
+                          <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
                             <AvatarImage
                               src={selectedConversation.avatar || "/placeholder.svg"}
                               alt={message.senderName}
                             />
-                            <AvatarFallback>
+                            <AvatarFallback className="text-xs">
                               {message.senderName
                                 .split(" ")
                                 .map((n) => n[0])
@@ -316,11 +342,11 @@ export default function MessagesPage() {
                           </Avatar>
                         )}
                         <div
-                          className={`px-4 py-2 rounded-lg ${
+                          className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg ${
                             message.isOwn ? "bg-orange-500 text-white" : "bg-slate-100 text-slate-900"
                           }`}
                         >
-                          <p className="text-sm">{message.content}</p>
+                          <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
                           <p className={`text-xs mt-1 ${message.isOwn ? "text-orange-100" : "text-slate-500"}`}>
                             {message.timestamp}
                           </p>
@@ -332,10 +358,10 @@ export default function MessagesPage() {
               </ScrollArea>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-slate-200 bg-white">
+              <div className="p-3 sm:p-4 border-t border-slate-200 bg-white">
                 <div className="flex items-end space-x-2">
-                  <Button variant="ghost" size="icon">
-                    <Paperclip className="w-5 h-5" />
+                  <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+                    <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                   <div className="flex-1">
                     <Textarea
@@ -348,29 +374,31 @@ export default function MessagesPage() {
                           handleSendMessage()
                         }
                       }}
-                      className="min-h-[40px] max-h-32 resize-none"
+                      className="min-h-[36px] sm:min-h-[40px] max-h-32 resize-none text-sm sm:text-base"
                       rows={1}
                     />
                   </div>
-                  <Button variant="ghost" size="icon">
-                    <Smile className="w-5 h-5" />
+                  <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+                    <Smile className="w-4 h-4 sm:w-5 sm:h-5" />
                   </Button>
                   <Button
                     onClick={handleSendMessage}
                     disabled={!newMessage.trim()}
-                    className="bg-orange-500 hover:bg-orange-600"
+                    className="bg-orange-500 hover:bg-orange-600 w-8 h-8 sm:w-10 sm:h-10 p-0"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-slate-50">
+            <div className="flex-1 flex items-center justify-center bg-slate-50 p-4">
               <div className="text-center">
-                <MessageCircle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-900 mb-2">Select a conversation</h3>
-                <p className="text-slate-600">Choose a conversation from the sidebar to start messaging</p>
+                <MessageCircle className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-base sm:text-lg font-medium text-slate-900 mb-2">Select a conversation</h3>
+                <p className="text-slate-600 text-sm sm:text-base">
+                  Choose a conversation from the sidebar to start messaging
+                </p>
               </div>
             </div>
           )}
