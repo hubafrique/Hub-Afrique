@@ -1,289 +1,381 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
+  ArrowRight,
   Users,
   Lightbulb,
   Eye,
   Heart,
-  GraduationCap,
+  BookOpen,
   Briefcase,
   Code,
   Award,
-  MessageSquare,
-  Calendar,
-  FileText,
-  Rocket,
+  MessageCircle,
+  Phone,
+  Mail,
+  Building,
+  CheckCircle,
   Facebook,
   Instagram,
   Linkedin,
   Twitter,
+  AlertCircle,
 } from "lucide-react"
-import { submitPartnershipInquiry } from "./actions"
+import Link from "next/link"
+import Image from "next/image"
+import { submitPartnershipInquiry, type PartnershipFormData } from "./actions"
 
 export default function PartnershipPage() {
+  const [formData, setFormData] = useState<PartnershipFormData>({
+    fullName: "",
+    organization: "",
+    email: "",
+    phone: "",
+    interestType: "",
+    message: "",
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
+  const [submitResult, setSubmitResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null)
 
-  const handleSubmit = async (formData: FormData) => {
-    setIsSubmitting(true)
-    setSubmitMessage(null)
-
-    const result = await submitPartnershipInquiry(formData)
-
-    if (result.success) {
-      setSubmitMessage({ type: "success", text: result.message || "Partnership inquiry submitted successfully!" })
-      // Reset form
-      const form = document.getElementById("partnership-form") as HTMLFormElement
-      form?.reset()
-    } else {
-      setSubmitMessage({ type: "error", text: result.error || "Failed to submit inquiry" })
+  const handleInputChange = (field: keyof PartnershipFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    // Clear previous submit result when user starts typing
+    if (submitResult) {
+      setSubmitResult(null)
     }
+  }
 
-    setIsSubmitting(false)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitResult(null)
+
+    try {
+      const result = await submitPartnershipInquiry(formData)
+      setSubmitResult(result)
+
+      if (result.success) {
+        // Reset form on success
+        setFormData({
+          fullName: "",
+          organization: "",
+          email: "",
+          phone: "",
+          interestType: "",
+          message: "",
+        })
+      }
+    } catch (error) {
+      setSubmitResult({
+        success: false,
+        error: "An unexpected error occurred. Please try again.",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const scrollToForm = () => {
     document.getElementById("partnership-form")?.scrollIntoView({ behavior: "smooth" })
   }
 
+  const benefits = [
+    {
+      icon: <Users className="w-8 h-8 text-blue-600" />,
+      title: "Access to Top Talent",
+      description: "Connect with skilled graduates and professionals across Africa.",
+    },
+    {
+      icon: <Lightbulb className="w-8 h-8 text-green-600" />,
+      title: "Innovative Collaboration",
+      description: "Co-create projects, research, and hackathons.",
+    },
+    {
+      icon: <Eye className="w-8 h-8 text-orange-600" />,
+      title: "Brand Visibility",
+      description: "Showcase your brand to our growing professional community.",
+    },
+    {
+      icon: <Heart className="w-8 h-8 text-red-600" />,
+      title: "Social Impact",
+      description: "Invest in Africa's next generation of leaders and innovators.",
+    },
+  ]
+
+  const partnershipModels = [
+    {
+      icon: <BookOpen className="w-12 h-12 text-blue-600" />,
+      title: "Training & Education Partners",
+      description: "Bootcamps, corporate training, workshops",
+      features: [
+        "Custom curriculum development",
+        "Instructor certification",
+        "Learning analytics",
+        "Brand co-marketing",
+      ],
+    },
+    {
+      icon: <Briefcase className="w-12 h-12 text-green-600" />,
+      title: "Hiring & Recruitment Partners",
+      description: "Access vetted talent pool via ProHub",
+      features: ["Pre-screened candidates", "Skills assessment", "Direct talent pipeline", "Recruitment analytics"],
+    },
+    {
+      icon: <Code className="w-12 h-12 text-purple-600" />,
+      title: "Project Collaboration",
+      description: "Joint ventures, hackathons, mentorship programs",
+      features: ["Innovation challenges", "Mentorship matching", "Project incubation", "Community engagement"],
+    },
+    {
+      icon: <Award className="w-12 h-12 text-orange-600" />,
+      title: "Sponsorship Opportunities",
+      description: "Event sponsorship, scholarship programs",
+      features: ["Event branding", "Scholarship funds", "Award ceremonies", "Media coverage"],
+    },
+  ]
+
+  const partnershipProcess = [
+    {
+      step: "01",
+      title: "Reach Out",
+      description: "Fill out our inquiry form",
+      icon: <MessageCircle className="w-6 h-6" />,
+    },
+    {
+      step: "02",
+      title: "Discovery Call",
+      description: "Discuss objectives & scope",
+      icon: <Phone className="w-6 h-6" />,
+    },
+    {
+      step: "03",
+      title: "Proposal",
+      description: "Customized partnership plan",
+      icon: <Building className="w-6 h-6" />,
+    },
+    {
+      step: "04",
+      title: "Launch",
+      description: "Collaborate and make impact",
+      icon: <CheckCircle className="w-6 h-6" />,
+    },
+  ]
+
+  const partners = [
+    { name: "Partner 1", logo: "/placeholder-partner.png" },
+    { name: "Partner 2", logo: "/placeholder-partner.png" },
+    { name: "Partner 3", logo: "/placeholder-partner.png" },
+    { name: "Partner 4", logo: "/placeholder-partner.png" },
+    { name: "Partner 5", logo: "/placeholder-partner.png" },
+    { name: "Partner 6", logo: "/placeholder-partner.png" },
+  ]
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <Image
+      <nav className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center space-x-3">
+              <img
                 src="/images/hub-afrique-logo.png"
-                alt="Hub Afrique"
-                width={40}
-                height={40}
-                className="rounded-lg"
+                alt="Hub Afrique Logo"
+                className="w-10 h-10 dark:brightness-110 dark:contrast-125"
               />
-              <span className="text-xl font-bold text-primary">Hub Afrique</span>
+              <div>
+                <span className="text-xl font-bold bg-gradient-to-r from-orange-500 via-orange-600 to-blue-600 bg-clip-text text-transparent">
+                  Hub Afrique
+                </span>
+                <p className="text-xs text-slate-600 dark:text-slate-400 hidden sm:block">
+                  African Professional Network
+                </p>
+              </div>
             </Link>
+
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="/"
+                className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+              >
                 Home
               </Link>
-              <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="/about"
+                className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+              >
                 About
               </Link>
-              <Link href="/careers" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="/careers"
+                className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+              >
                 Careers
               </Link>
-              <Link href="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link
+                href="/pricing"
+                className="text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+              >
                 Pricing
               </Link>
-              <Link href="/partnership" className="text-primary font-medium">
-                Partnership
-              </Link>
             </div>
+
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link href="/auth/signin">Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/auth/signup">Get Started</Link>
-              </Button>
+              <Link href="/auth/signin">
+                <Button variant="ghost" className="hover:bg-orange-50 dark:hover:bg-orange-900/20">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/auth/signup">
+                <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 dark:from-orange-950/20 dark:via-red-950/20 dark:to-yellow-950/20" />
-        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=800&width=1200&text=African+Pattern')] opacity-5" />
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Partner with <span className="text-orange-600">Hub Afrique</span>
+      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Badge className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-700 mb-4 sm:mb-6 text-xs sm:text-sm">
+            🤝 Partnership Opportunities
+          </Badge>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4 sm:mb-6 leading-tight">
+            Partner with{" "}
+            <span className="bg-gradient-to-r from-orange-500 via-orange-600 to-blue-600 bg-clip-text text-transparent">
+              Hub Afrique
+            </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-            Join us in empowering Africa's professionals — from learning to earning.
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
+            Join us in empowering Africa's professionals — from learning to earning. Together, we can build the future
+            of work across the continent.
           </p>
-          <Button size="lg" onClick={scrollToForm} className="bg-orange-600 hover:bg-orange-700">
+          <Button
+            size="lg"
+            onClick={scrollToForm}
+            className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
+          >
             Start a Partnership
+            <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
           </Button>
         </div>
       </section>
 
       {/* Why Partner With Us */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Partner With Us</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Unlock opportunities and create meaningful impact across Africa's professional landscape
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Why Partner With Us?
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+              Join Africa's fastest-growing professional network and make a lasting impact
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-orange-600" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Access to Top Talent</h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Connect with skilled graduates and professionals across Africa.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Lightbulb className="w-8 h-8 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Innovative Collaboration</h3>
-                <p className="text-gray-600 dark:text-gray-300">Co-create projects, research, and hackathons.</p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Eye className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Brand Visibility</h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Showcase your brand to our growing professional community.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Heart className="w-8 h-8 text-red-600" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">Social Impact</h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Invest in Africa's next generation of leaders and innovators.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {benefits.map((benefit, index) => (
+              <Card
+                key={index}
+                className="text-center hover:shadow-lg transition-shadow border-slate-200 dark:border-slate-700"
+              >
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex justify-center mb-3 sm:mb-4">{benefit.icon}</div>
+                  <CardTitle className="text-lg sm:text-xl text-slate-900 dark:text-slate-100 leading-tight">
+                    {benefit.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <CardDescription className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+                    {benefit.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Partnership Models */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-slate-50 dark:bg-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Partnership Models</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Choose the partnership model that aligns with your goals and objectives
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Partnership Models
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300">
+              Choose the partnership model that aligns with your goals
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-0">
-                <div className="flex items-center mb-4">
-                  <GraduationCap className="w-8 h-8 text-orange-600 mr-3" />
-                  <h3 className="text-2xl font-semibold">Training & Education Partners</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Collaborate on bootcamps, corporate training programs, and specialized workshops to upskill Africa's
-                  workforce.
-                </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <li>• Custom curriculum development</li>
-                  <li>• Corporate training programs</li>
-                  <li>• Professional certification courses</li>
-                  <li>• Skills assessment and validation</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-0">
-                <div className="flex items-center mb-4">
-                  <Briefcase className="w-8 h-8 text-blue-600 mr-3" />
-                  <h3 className="text-2xl font-semibold">Hiring & Recruitment Partners</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Access our vetted talent pool through ProHub and streamline your recruitment process across Africa.
-                </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <li>• Pre-screened candidate pipeline</li>
-                  <li>• Skills-based matching</li>
-                  <li>• Remote work facilitation</li>
-                  <li>• Talent retention programs</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-0">
-                <div className="flex items-center mb-4">
-                  <Code className="w-8 h-8 text-green-600 mr-3" />
-                  <h3 className="text-2xl font-semibold">Project Collaboration</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Partner on joint ventures, hackathons, and mentorship programs that drive innovation across the
-                  continent.
-                </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <li>• Innovation challenges</li>
-                  <li>• Research partnerships</li>
-                  <li>• Mentorship programs</li>
-                  <li>• Open source contributions</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="p-8 hover:shadow-lg transition-shadow">
-              <CardContent className="pt-0">
-                <div className="flex items-center mb-4">
-                  <Award className="w-8 h-8 text-purple-600 mr-3" />
-                  <h3 className="text-2xl font-semibold">Sponsorship Opportunities</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Support our mission through event sponsorship, scholarship programs, and community initiatives.
-                </p>
-                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <li>• Event and conference sponsorship</li>
-                  <li>• Scholarship and grant programs</li>
-                  <li>• Community outreach initiatives</li>
-                  <li>• Brand partnership campaigns</li>
-                </ul>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+            {partnershipModels.map((model, index) => (
+              <Card key={index} className="hover:shadow-lg transition-shadow border-slate-200 dark:border-slate-700">
+                <CardHeader className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-3 sm:mb-4">
+                    {model.icon}
+                    <div className="text-center sm:text-left">
+                      <CardTitle className="text-lg sm:text-xl text-slate-900 dark:text-slate-100 leading-tight">
+                        {model.title}
+                      </CardTitle>
+                      <CardDescription className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mt-1">
+                        {model.description}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <ul className="space-y-2 sm:space-y-3">
+                    {model.features.map((feature, featureIndex) => (
+                      <li
+                        key={featureIndex}
+                        className="flex items-start space-x-2 sm:space-x-3 text-slate-600 dark:text-slate-300"
+                      >
+                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm md:text-base">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Current & Past Partners */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Partners</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">Our Partners</h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300">
               Trusted by leading organizations across Africa and beyond
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
-              <div key={i} className="flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <Image
-                  src={`/placeholder-partner.png?height=60&width=120&text=Partner+${i}`}
-                  alt={`Partner ${i}`}
-                  width={120}
-                  height={60}
-                  className="opacity-60 hover:opacity-100 transition-opacity"
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+            {partners.map((partner, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-800 rounded-lg hover:shadow-md transition-shadow"
+              >
+                <img
+                  src={partner.logo || "/placeholder.svg"}
+                  alt={partner.name}
+                  className="max-w-full max-h-12 object-contain opacity-60 hover:opacity-100 transition-opacity"
                 />
               </div>
             ))}
@@ -292,237 +384,256 @@ export default function PartnershipPage() {
       </section>
 
       {/* Partnership Process */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-slate-50 dark:bg-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Partnership Process</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Simple steps to start your partnership journey with us
-            </p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Partnership Process
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300">Simple steps to start our collaboration</p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="w-8 h-8 text-orange-600" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {partnershipProcess.map((step, index) => (
+              <div key={index} className="text-center">
+                <div className="relative mb-4 sm:mb-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-white">
+                    {step.icon}
+                  </div>
+                  <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                    <span className="text-xs sm:text-sm font-bold text-orange-600 dark:text-orange-400">
+                      {step.step}
+                    </span>
+                  </div>
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2 leading-tight">
+                  {step.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Reach Out</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Fill out our inquiry form with your partnership interests and goals.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">2. Discovery Call</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Schedule a call to discuss objectives, scope, and mutual benefits.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">3. Proposal</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Receive a customized partnership plan tailored to your needs.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Rocket className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">4. Launch</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Begin collaboration and start making meaningful impact together.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Partnership Inquiry Form */}
-      <section id="partnership-form" className="py-20 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Start Your Partnership Journey
-              </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
-                Ready to collaborate? Fill out the form below and we'll get back to you within 2-3 business days.
-              </p>
-            </div>
+      <section id="partnership-form" className="py-20 bg-white dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Partnership Inquiry
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300">
+              Ready to partner with us? Fill out the form below and we'll get back to you within 2-3 business days.
+            </p>
+          </div>
 
-            <Card className="p-8">
-              <CardContent className="pt-0">
-                <form id="partnership-form" action={handleSubmit}>
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <Label htmlFor="full_name">Full Name *</Label>
-                      <Input
-                        id="full_name"
-                        name="full_name"
-                        type="text"
-                        required
-                        className="mt-1"
-                        placeholder="Enter your full name"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="organization">Organization Name *</Label>
-                      <Input
-                        id="organization"
-                        name="organization"
-                        type="text"
-                        required
-                        className="mt-1"
-                        placeholder="Enter your organization"
-                      />
-                    </div>
-                  </div>
+          <Card className="border-slate-200 dark:border-slate-700">
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              {submitResult && (
+                <Alert
+                  className={`mb-6 ${submitResult.success ? "border-green-200 bg-green-50 dark:bg-green-900/20" : "border-red-200 bg-red-50 dark:bg-red-900/20"}`}
+                >
+                  {submitResult.success ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                  )}
+                  <AlertDescription
+                    className={
+                      submitResult.success ? "text-green-800 dark:text-green-200" : "text-red-800 dark:text-red-200"
+                    }
+                  >
+                    {submitResult.success ? submitResult.message : submitResult.error}
+                  </AlertDescription>
+                </Alert>
+              )}
 
-                  <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                      <Label htmlFor="email">Email Address *</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        required
-                        className="mt-1"
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        className="mt-1"
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <Label htmlFor="interest_type">Partnership Interest *</Label>
-                    <Select name="interest_type" required>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select partnership type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="training">Training & Education</SelectItem>
-                        <SelectItem value="hiring">Hiring & Recruitment</SelectItem>
-                        <SelectItem value="sponsorship">Sponsorship</SelectItem>
-                        <SelectItem value="collaboration">Project Collaboration</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="mb-6">
-                    <Label htmlFor="message">Message *</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                      Full Name *
+                    </Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={(e) => handleInputChange("fullName", e.target.value)}
+                      className="mt-1 text-sm sm:text-base"
                       required
-                      className="mt-1"
-                      rows={5}
-                      placeholder="Tell us about your partnership goals, objectives, and how you'd like to collaborate with Hub Afrique..."
                     />
                   </div>
+                  <div>
+                    <Label htmlFor="organization" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                      Organization Name *
+                    </Label>
+                    <Input
+                      id="organization"
+                      type="text"
+                      value={formData.organization}
+                      onChange={(e) => handleInputChange("organization", e.target.value)}
+                      className="mt-1 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
+                </div>
 
-                  {submitMessage && (
-                    <div
-                      className={`mb-6 p-4 rounded-md ${
-                        submitMessage.type === "success"
-                          ? "bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800"
-                          : "bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800"
-                      }`}
-                    >
-                      {submitMessage.text}
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  <div>
+                    <Label htmlFor="email" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                      Email *
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      className="mt-1 text-sm sm:text-base"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                      Phone
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      className="mt-1 text-sm sm:text-base"
+                    />
+                  </div>
+                </div>
 
-                  <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700" disabled={isSubmitting}>
-                    {isSubmitting ? "Sending Partnership Request..." : "Send Partnership Request"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                <div>
+                  <Label htmlFor="interestType" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                    Partnership Interest *
+                  </Label>
+                  <Select
+                    value={formData.interestType}
+                    onValueChange={(value) => handleInputChange("interestType", value)}
+                  >
+                    <SelectTrigger className="mt-1 text-sm sm:text-base">
+                      <SelectValue placeholder="Select partnership type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="training">Training & Education</SelectItem>
+                      <SelectItem value="hiring">Hiring & Recruitment</SelectItem>
+                      <SelectItem value="sponsorship">Sponsorship</SelectItem>
+                      <SelectItem value="collaboration">Project Collaboration</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="text-center mt-8">
-              <p className="text-gray-600 dark:text-gray-300">
-                Have questions? Email us directly at{" "}
-                <a href="mailto:partnerships@hubafrique.com" className="text-orange-600 hover:underline">
-                  partnerships@hubafrique.com
-                </a>
-              </p>
-            </div>
-          </div>
+                <div>
+                  <Label htmlFor="message" className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
+                    Message *
+                  </Label>
+                  <Textarea
+                    id="message"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange("message", e.target.value)}
+                    className="mt-1 text-sm sm:text-base"
+                    rows={4}
+                    placeholder="Tell us about your partnership goals and how we can work together..."
+                    required
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white py-3 text-base sm:text-lg"
+                >
+                  {isSubmitting ? "Sending..." : "Send Partnership Request"}
+                  {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />}
+                </Button>
+              </form>
+
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center space-x-2">
+                    <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>partnerships@hubafrique.com</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Response within 2-3 business days</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <footer className="bg-slate-900 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             {/* Company Info */}
-            <div className="lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-4">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
                 <Image
                   src="/images/hub-afrique-logo.png"
-                  alt="Hub Afrique"
+                  alt="Hub Afrique Logo"
                   width={32}
                   height={32}
-                  className="rounded-lg"
+                  className="brightness-110 contrast-125"
                 />
-                <span className="text-xl font-bold">Hub Afrique</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-orange-400 to-blue-400 bg-clip-text text-transparent">
+                  Hub Afrique
+                </span>
               </div>
-              <p className="text-gray-400 mb-4">
-                Empowering Africa's professionals from learning to earning through innovative technology and community.
+              <p className="text-slate-400 mb-4">
+                Empowering African professionals through innovative learning and networking solutions.
               </p>
               <div className="flex space-x-4">
-                <a href="https://facebook.com/hapnethq" className="text-gray-400 hover:text-white transition-colors">
+                <Link
+                  href="https://facebook.com/hapnethq"
+                  className="text-slate-400 hover:text-orange-400 transition-colors"
+                >
                   <Facebook className="w-5 h-5" />
-                </a>
-                <a href="https://instagram.com/hapnethq" className="text-gray-400 hover:text-white transition-colors">
+                </Link>
+                <Link
+                  href="https://instagram.com/hapnethq"
+                  className="text-slate-400 hover:text-orange-400 transition-colors"
+                >
                   <Instagram className="w-5 h-5" />
-                </a>
-                <a
+                </Link>
+                <Link
                   href="https://linkedin.com/company/hapnet"
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-orange-400 transition-colors"
                 >
                   <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="https://x.com/hapnet" className="text-gray-400 hover:text-white transition-colors">
+                </Link>
+                <Link href="https://x.com/hapnet" className="text-slate-400 hover:text-orange-400 transition-colors">
                   <Twitter className="w-5 h-5" />
-                </a>
+                </Link>
               </div>
             </div>
 
             {/* Platform */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Platform</h3>
-              <ul className="space-y-2">
+              <h3 className="font-semibold mb-4">Platform</h3>
+              <ul className="space-y-2 text-slate-400">
                 <li>
-                  <Link href="/prolab" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/prolab" className="hover:text-orange-400 transition-colors">
                     ProLab
                   </Link>
                 </li>
                 <li>
-                  <Link href="/ihub" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/ihub" className="hover:text-orange-400 transition-colors">
                     iHub
                   </Link>
                 </li>
                 <li>
-                  <Link href="/prohub" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/prohub" className="hover:text-orange-400 transition-colors">
                     ProHub
                   </Link>
                 </li>
@@ -531,25 +642,25 @@ export default function PartnershipPage() {
 
             {/* Company */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2">
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-slate-400">
                 <li>
-                  <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/about" className="hover:text-orange-400 transition-colors">
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/careers" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/careers" className="hover:text-orange-400 transition-colors">
                     Careers
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/pricing" className="hover:text-orange-400 transition-colors">
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link href="/partnership" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/partnership" className="hover:text-orange-400 transition-colors">
                     Partnership
                   </Link>
                 </li>
@@ -558,25 +669,25 @@ export default function PartnershipPage() {
 
             {/* Support */}
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2">
+              <h3 className="font-semibold mb-4">Support</h3>
+              <ul className="space-y-2 text-slate-400">
                 <li>
-                  <Link href="/help" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/help" className="hover:text-orange-400 transition-colors">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/contact" className="hover:text-orange-400 transition-colors">
                     Contact
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/privacy" className="hover:text-orange-400 transition-colors">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/terms" className="hover:text-orange-400 transition-colors">
                     Terms
                   </Link>
                 </li>
@@ -584,9 +695,11 @@ export default function PartnershipPage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">© 2024 Hub Afrique. All rights reserved.</p>
-            <p className="text-gray-400 text-sm mt-2 md:mt-0">Made with ❤️ for African professionals</p>
+          <Separator className="bg-slate-700 mb-8" />
+
+          <div className="flex flex-col md:flex-row justify-between items-center text-slate-400">
+            <p>&copy; 2024 Hub Afrique. All rights reserved.</p>
+            <p className="mt-2 md:mt-0">Made with ❤️ for African professionals</p>
           </div>
         </div>
       </footer>

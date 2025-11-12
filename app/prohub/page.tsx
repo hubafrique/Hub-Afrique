@@ -43,6 +43,14 @@ export default function ProHubPage() {
   const [selectedLocation, setSelectedLocation] = useState("all")
   const [selectedType, setSelectedType] = useState("all")
 
+  // Tab options for mobile dropdown
+  const tabOptions = [
+    { value: "browse", label: "Browse Jobs" },
+    { value: "applications", label: "My Applications" },
+    { value: "saved", label: "Saved Jobs" },
+    { value: "profile", label: "Talent Profile" },
+  ]
+
   // Mock data
   const jobs = [
     {
@@ -183,72 +191,89 @@ export default function ProHubPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-xl p-6 text-white">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-xl p-4 sm:p-6 text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold mb-2">ProHub Marketplace</h1>
-              <p className="opacity-90">Discover premium opportunities across Africa</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">ProHub Marketplace</h1>
+              <p className="opacity-90 text-sm sm:text-base">Discover premium opportunities across Africa</p>
             </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold">{jobs.length}</div>
-              <div className="text-sm opacity-90">Active Jobs</div>
+            <div className="text-center sm:text-right">
+              <div className="text-xl sm:text-2xl font-bold">{jobs.length}</div>
+              <div className="text-xs sm:text-sm opacity-90">Active Jobs</div>
             </div>
           </div>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
           <Card className="border-blue-200 bg-blue-50/50">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600">Applications</p>
-                  <p className="text-2xl font-bold text-blue-900">{applications.length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-blue-600">Applications</p>
+                  <p className="text-lg sm:text-2xl font-bold text-blue-900">{applications.length}</p>
                 </div>
-                <FileText className="w-8 h-8 text-blue-500" />
+                <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-green-200 bg-green-50/50">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-green-600">Interviews</p>
-                  <p className="text-2xl font-bold text-green-900">2</p>
+                  <p className="text-xs sm:text-sm font-medium text-green-600">Interviews</p>
+                  <p className="text-lg sm:text-2xl font-bold text-green-900">2</p>
                 </div>
-                <Calendar className="w-8 h-8 text-green-500" />
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-purple-200 bg-purple-50/50">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-purple-600">Saved Jobs</p>
-                  <p className="text-2xl font-bold text-purple-900">{savedJobs.length}</p>
+                  <p className="text-xs sm:text-sm font-medium text-purple-600">Saved Jobs</p>
+                  <p className="text-lg sm:text-2xl font-bold text-purple-900">{savedJobs.length}</p>
                 </div>
-                <Heart className="w-8 h-8 text-purple-500" />
+                <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-orange-200 bg-orange-50/50">
-            <CardContent className="p-6">
+            <CardContent className="p-3 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-orange-600">Profile Views</p>
-                  <p className="text-2xl font-bold text-orange-900">127</p>
+                  <p className="text-xs sm:text-sm font-medium text-orange-600">Profile Views</p>
+                  <p className="text-lg sm:text-2xl font-bold text-orange-900">127</p>
                 </div>
-                <Eye className="w-8 h-8 text-orange-500" />
+                <Eye className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          {/* Mobile Dropdown Navigation */}
+          <div className="md:hidden">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                {tabOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop Tabs Navigation */}
+          <TabsList className="hidden md:grid w-full grid-cols-4">
             <TabsTrigger value="browse">Browse Jobs</TabsTrigger>
             <TabsTrigger value="applications">My Applications</TabsTrigger>
             <TabsTrigger value="saved">Saved Jobs</TabsTrigger>
@@ -257,53 +282,55 @@ export default function ProHubPage() {
 
           <TabsContent value="browse" className="space-y-6">
             {/* Search and Filters */}
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="relative flex-1">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <Input
                   placeholder="Search jobs, companies, or skills..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm sm:text-base"
                 />
               </div>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="react">React</SelectItem>
-                  <SelectItem value="python">Python</SelectItem>
-                  <SelectItem value="design">Design</SelectItem>
-                  <SelectItem value="mobile">Mobile</SelectItem>
-                  <SelectItem value="data">Data Science</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="Lagos">Lagos</SelectItem>
-                  <SelectItem value="Nairobi">Nairobi</SelectItem>
-                  <SelectItem value="Cape Town">Cape Town</SelectItem>
-                  <SelectItem value="Accra">Accra</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-full lg:w-48">
-                  <SelectValue placeholder="Job Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Full-time">Full-time</SelectItem>
-                  <SelectItem value="Contract">Contract</SelectItem>
-                  <SelectItem value="Part-time">Part-time</SelectItem>
-                  <SelectItem value="Freelance">Freelance</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="react">React</SelectItem>
+                    <SelectItem value="python">Python</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="mobile">Mobile</SelectItem>
+                    <SelectItem value="data">Data Science</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    <SelectItem value="Lagos">Lagos</SelectItem>
+                    <SelectItem value="Nairobi">Nairobi</SelectItem>
+                    <SelectItem value="Cape Town">Cape Town</SelectItem>
+                    <SelectItem value="Accra">Accra</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger className="text-xs sm:text-sm">
+                    <SelectValue placeholder="Job Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="Full-time">Full-time</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                    <SelectItem value="Part-time">Part-time</SelectItem>
+                    <SelectItem value="Freelance">Freelance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Job Listings */}
@@ -313,32 +340,42 @@ export default function ProHubPage() {
                   key={job.id}
                   className={`hover:shadow-lg transition-shadow ${job.featured ? "border-orange-300 bg-orange-50/30" : ""}`}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
+                  <CardContent className="p-3 sm:p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                       <img
                         src={job.logo || "/placeholder.svg"}
                         alt={`${job.company} logo`}
-                        className="w-16 h-16 object-cover rounded-lg border border-slate-200"
+                        className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg border border-slate-200 mx-auto sm:mx-0"
                       />
 
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 space-y-2 sm:space-y-0">
                           <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-xl font-semibold text-slate-900">{job.title}</h3>
-                              {job.featured && <Badge className="bg-orange-500 text-white">Featured</Badge>}
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="text-lg sm:text-xl font-semibold text-slate-900 leading-tight">
+                                {job.title}
+                              </h3>
+                              {job.featured && (
+                                <Badge className="bg-orange-500 text-white text-xs w-fit mx-auto sm:mx-0">
+                                  Featured
+                                </Badge>
+                              )}
                             </div>
-                            <p className="text-slate-600 font-medium">{job.company}</p>
+                            <p className="text-slate-600 font-medium text-sm sm:text-base">{job.company}</p>
                           </div>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
                             <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-500">
-                              <Heart className={`w-5 h-5 ${job.saved ? "fill-red-500 text-red-500" : ""}`} />
+                              <Heart
+                                className={`w-4 h-4 sm:w-5 sm:h-5 ${job.saved ? "fill-red-500 text-red-500" : ""}`}
+                              />
                             </Button>
                             <Dialog>
                               <DialogTrigger asChild>
-                                <Button className="bg-orange-500 hover:bg-orange-600">Apply Now</Button>
+                                <Button className="bg-orange-500 hover:bg-orange-600 text-sm sm:text-base w-full sm:w-auto">
+                                  Apply Now
+                                </Button>
                               </DialogTrigger>
-                              <DialogContent className="max-w-2xl">
+                              <DialogContent className="max-w-2xl mx-4">
                                 <DialogHeader>
                                   <DialogTitle>Apply for {job.title}</DialogTitle>
                                   <DialogDescription>Submit your application to {job.company}</DialogDescription>
@@ -368,9 +405,11 @@ export default function ProHubPage() {
                                       I agree to the terms and conditions and privacy policy
                                     </Label>
                                   </div>
-                                  <div className="flex justify-end space-x-2">
-                                    <Button variant="outline">Save as Draft</Button>
-                                    <Button className="bg-orange-500 hover:bg-orange-600">
+                                  <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+                                    <Button variant="outline" className="w-full sm:w-auto bg-transparent">
+                                      Save as Draft
+                                    </Button>
+                                    <Button className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto">
                                       <Send className="w-4 h-4 mr-2" />
                                       Submit Application
                                     </Button>
@@ -381,33 +420,35 @@ export default function ProHubPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center space-x-4 text-sm text-slate-600 mb-3">
+                        <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600 mb-3">
                           <div className="flex items-center space-x-1">
-                            <MapPin className="w-4 h-4" />
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{job.location}</span>
                             {job.remote && (
-                              <Badge variant="secondary" className="ml-1">
+                              <Badge variant="secondary" className="ml-1 text-xs">
                                 Remote
                               </Badge>
                             )}
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Briefcase className="w-4 h-4" />
+                            <Briefcase className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{job.type}</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <DollarSign className="w-4 h-4" />
-                            <span>{job.salary}</span>
+                            <DollarSign className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="text-xs sm:text-sm">{job.salary}</span>
                           </div>
                           <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{job.postedDate}</span>
                           </div>
                         </div>
 
-                        <p className="text-slate-700 mb-4 line-clamp-2">{job.description}</p>
+                        <p className="text-slate-700 mb-4 line-clamp-2 text-xs sm:text-sm leading-relaxed">
+                          {job.description}
+                        </p>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap gap-1 sm:gap-2 mb-4 justify-center sm:justify-start">
                           {job.skills.map((skill) => (
                             <Badge key={skill} variant="outline" className="text-xs">
                               {skill}
@@ -415,12 +456,19 @@ export default function ProHubPage() {
                           ))}
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-600">{job.applicants} applicants</span>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
-                              <Eye className="w-4 h-4 mr-1" />
-                              View Details
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <span className="text-xs sm:text-sm text-slate-600 text-center sm:text-left">
+                            {job.applicants} applicants
+                          </span>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 sm:flex-none text-xs sm:text-sm bg-transparent"
+                            >
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                              <span className="hidden sm:inline">View Details</span>
+                              <span className="sm:hidden">View</span>
                             </Button>
                           </div>
                         </div>
@@ -436,24 +484,35 @@ export default function ProHubPage() {
             <div className="space-y-4">
               {applications.map((application) => (
                 <Card key={application.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-1">{application.jobTitle}</h3>
-                        <p className="text-slate-600 mb-2">{application.company}</p>
-                        <p className="text-sm text-slate-500 mb-3">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1">
+                          {application.jobTitle}
+                        </h3>
+                        <p className="text-slate-600 mb-2 text-sm sm:text-base">{application.company}</p>
+                        <p className="text-xs sm:text-sm text-slate-500 mb-3">
                           Applied on {new Date(application.appliedDate).toLocaleDateString()}
                         </p>
-                        <p className="text-sm text-slate-600">{application.nextStep}</p>
+                        <p className="text-xs sm:text-sm text-slate-600">{application.nextStep}</p>
                       </div>
-                      <div className="text-right">
-                        <Badge className={`${application.statusColor} text-white mb-2`}>{application.status}</Badge>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
+                      <div className="text-center sm:text-right">
+                        <Badge className={`${application.statusColor} text-white mb-2 text-xs`}>
+                          {application.status}
+                        </Badge>
+                        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full sm:w-auto text-xs sm:text-sm bg-transparent"
+                          >
                             View Application
                           </Button>
                           {application.status === "Interview Scheduled" && (
-                            <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+                            <Button
+                              size="sm"
+                              className="bg-blue-500 hover:bg-blue-600 w-full sm:w-auto text-xs sm:text-sm"
+                            >
                               Join Interview
                             </Button>
                           )}
@@ -471,46 +530,46 @@ export default function ProHubPage() {
               <div className="space-y-4">
                 {savedJobs.map((job) => (
                   <Card key={job.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                         <img
                           src={job.logo || "/placeholder.svg"}
                           alt={`${job.company} logo`}
-                          className="w-16 h-16 object-cover rounded-lg border border-slate-200"
+                          className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg border border-slate-200 mx-auto sm:mx-0"
                         />
 
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 text-center sm:text-left">
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 space-y-2 sm:space-y-0">
                             <div>
-                              <h3 className="text-xl font-semibold text-slate-900">{job.title}</h3>
-                              <p className="text-slate-600 font-medium">{job.company}</p>
+                              <h3 className="text-lg sm:text-xl font-semibold text-slate-900">{job.title}</h3>
+                              <p className="text-slate-600 font-medium text-sm sm:text-base">{job.company}</p>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
                               <Button variant="ghost" size="icon" className="text-red-500">
-                                <Heart className="w-5 h-5 fill-red-500" />
+                                <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-red-500" />
                               </Button>
-                              <Button className="bg-orange-500 hover:bg-orange-600">Apply Now</Button>
+                              <Button className="bg-orange-500 hover:bg-orange-600 w-full sm:w-auto">Apply Now</Button>
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-4 text-sm text-slate-600 mb-3">
+                          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm text-slate-600 mb-3">
                             <div className="flex items-center space-x-1">
-                              <MapPin className="w-4 h-4" />
+                              <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>{job.location}</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <DollarSign className="w-4 h-4" />
+                              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>{job.salary}</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <Clock className="w-4 h-4" />
+                              <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                               <span>{job.postedDate}</span>
                             </div>
                           </div>
 
-                          <p className="text-slate-700 mb-4">{job.description}</p>
+                          <p className="text-slate-700 mb-4 text-sm sm:text-base">{job.description}</p>
 
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1 sm:gap-2 justify-center sm:justify-start">
                             {job.skills.map((skill) => (
                               <Badge key={skill} variant="outline" className="text-xs">
                                 {skill}
@@ -525,10 +584,10 @@ export default function ProHubPage() {
               </div>
             ) : (
               <Card>
-                <CardContent className="p-12 text-center">
-                  <Heart className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">No Saved Jobs</h3>
-                  <p className="text-slate-600 mb-4">
+                <CardContent className="p-8 sm:p-12 text-center">
+                  <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">No Saved Jobs</h3>
+                  <p className="text-slate-600 mb-4 text-sm sm:text-base">
                     Start saving jobs you're interested in to keep track of opportunities
                   </p>
                   <Button onClick={() => setActiveTab("browse")} className="bg-orange-500 hover:bg-orange-600">
@@ -548,16 +607,16 @@ export default function ProHubPage() {
                     <CardDescription>Showcase your skills and experience to potential employers</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="w-20 h-20">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                      <Avatar className="w-16 h-16 sm:w-20 sm:h-20 mx-auto sm:mx-0">
                         <AvatarImage src="/placeholder.svg?height=80&width=80" />
                         <AvatarFallback>JD</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-slate-900">John Doe</h3>
-                        <p className="text-slate-600">Full-Stack Developer</p>
-                        <p className="text-sm text-slate-500">Lagos, Nigeria • Available for work</p>
-                        <div className="flex items-center space-x-2 mt-2">
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-lg sm:text-xl font-semibold text-slate-900">John Doe</h3>
+                        <p className="text-slate-600 text-sm sm:text-base">Full-Stack Developer</p>
+                        <p className="text-xs sm:text-sm text-slate-500">Lagos, Nigeria • Available for work</p>
+                        <div className="flex items-center justify-center sm:justify-start space-x-2 mt-2">
                           <div className="flex items-center space-x-1">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                             <span className="text-sm font-medium">4.9</span>
@@ -565,12 +624,14 @@ export default function ProHubPage() {
                           <span className="text-sm text-slate-600">(23 reviews)</span>
                         </div>
                       </div>
-                      <Button variant="outline">Edit Profile</Button>
+                      <Button variant="outline" className="w-full sm:w-auto bg-transparent">
+                        Edit Profile
+                      </Button>
                     </div>
 
                     <div>
                       <h4 className="font-medium text-slate-900 mb-2">About</h4>
-                      <p className="text-slate-600">
+                      <p className="text-slate-600 text-sm sm:text-base">
                         Passionate full-stack developer with 5+ years of experience building scalable web applications.
                         Specialized in React, Node.js, and cloud technologies. Strong advocate for clean code and
                         user-centered design.
@@ -582,7 +643,7 @@ export default function ProHubPage() {
                       <div className="flex flex-wrap gap-2">
                         {["React", "Node.js", "TypeScript", "Python", "AWS", "MongoDB", "PostgreSQL", "Docker"].map(
                           (skill) => (
-                            <Badge key={skill} variant="secondary" className="text-sm">
+                            <Badge key={skill} variant="secondary" className="text-xs sm:text-sm">
                               {skill}
                             </Badge>
                           ),
@@ -594,16 +655,16 @@ export default function ProHubPage() {
                       <h4 className="font-medium text-slate-900 mb-3">Experience</h4>
                       <div className="space-y-4">
                         <div className="border-l-2 border-orange-200 pl-4">
-                          <h5 className="font-medium text-slate-900">Senior Developer</h5>
-                          <p className="text-slate-600">TechCorp Africa • 2022 - Present</p>
-                          <p className="text-sm text-slate-500 mt-1">
+                          <h5 className="font-medium text-slate-900 text-sm sm:text-base">Senior Developer</h5>
+                          <p className="text-slate-600 text-xs sm:text-sm">TechCorp Africa • 2022 - Present</p>
+                          <p className="text-xs sm:text-sm text-slate-500 mt-1">
                             Led development of fintech platform serving 100k+ users across Nigeria
                           </p>
                         </div>
                         <div className="border-l-2 border-orange-200 pl-4">
-                          <h5 className="font-medium text-slate-900">Full-Stack Developer</h5>
-                          <p className="text-slate-600">StartupHub Lagos • 2020 - 2022</p>
-                          <p className="text-sm text-slate-500 mt-1">
+                          <h5 className="font-medium text-slate-900 text-sm sm:text-base">Full-Stack Developer</h5>
+                          <p className="text-slate-600 text-xs sm:text-sm">StartupHub Lagos • 2020 - 2022</p>
+                          <p className="text-xs sm:text-sm text-slate-500 mt-1">
                             Built and maintained multiple web applications using React and Node.js
                           </p>
                         </div>
