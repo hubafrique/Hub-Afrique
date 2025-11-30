@@ -17,6 +17,14 @@ export type Profile = {
   bio?: string
   skills?: string[]
   location?: string
+  // Settings preferences
+  theme?: "light" | "dark" | "system"
+  email_notifications?: boolean
+  push_notifications?: boolean
+  marketing_emails?: boolean
+  language?: string
+  profile_visibility?: "public" | "private" | "connections"
+  two_factor_enabled?: boolean
   created_at: string
   updated_at: string
 }
@@ -96,4 +104,18 @@ export type PartnershipInquiry = {
   interest_type: string
   message: string
   created_at: string
+}
+
+export type UserSettings = {
+  id: string
+  user_id: string
+  theme: "light" | "dark" | "system"
+  email_notifications: boolean
+  push_notifications: boolean
+  marketing_emails: boolean
+  language: string
+  profile_visibility: "public" | "private" | "connections"
+  two_factor_enabled: boolean
+  created_at: string
+  updated_at: string
 }

@@ -1,5 +1,5 @@
 import { supabase } from "./supabase"
-import type { Profile, Notification, Job } from "./supabase"
+import type { Profile, Notification, Job, UserSettings } from "./supabase"
 
 export const database = {
   // Profile operations
@@ -216,6 +216,26 @@ export const database = {
 
     async getOnboardingForm(userId: string) {
       const { data, error } = await supabase.from("onboarding_forms").select("*").eq("user_id", userId).single()
+      return { data, error }
+    },
+  },
+
+  // User settings operations
+  userSettings: {
+    async getUserSettings(userId: string) {
+      const { data, error } = await supabase.from("user_settings").select("*").eq("user_id", userId).single()
+      return { data, error }
+    },
+
+    async upsertUserSettings(userId: string, settings: Omit<UserSettings, "id" | "user_id" | "created_at" | "updated_at">) {
+      const { data, error } = await supabase
+        .from("user_settings")
+        .upsert({
+          user_id: userId,
+          ...settings,
+        })
+        .select()
+        .single()
       return { data, error }
     },
   },
