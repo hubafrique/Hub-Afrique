@@ -38,6 +38,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useAuth } from "@/hooks/use-auth"
 
 const navigation = [
   {
@@ -78,7 +79,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [notifications, setNotifications] = useState(3)
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const { user, profile } = useAuth();
+
+  console.log(user);
+
 
   // Ensure component is mounted before rendering theme-dependent content
   useEffect(() => {
@@ -332,18 +337,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   className={`${isCollapsed ? "w-9 h-9 sm:w-10 sm:h-10 p-0" : "w-full justify-start"} hover:bg-orange-100 dark:hover:bg-orange-900/20`}
                 >
                   <Avatar className="h-7 w-7 sm:h-8 sm:w-8 shrink-0">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="John Doe" />
+                    <AvatarImage src={profile?.profile_picture || user.user_metadata.avatar_url || "/placeholder.svg?height=32&width=32"} alt={"User"} />
                     <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-600 text-white text-xs sm:text-sm">
-                      JD
+                      {user?.user_metadata.full_name.split(' ').map(l => l[0]).join('') || "JD"}
                     </AvatarFallback>
                   </Avatar>
                   {!isCollapsed && (
                     <>
                       <div className="ml-2 sm:ml-3 text-left flex-1 min-w-0">
                         <p className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                          John Doe
+                          {user.user_metadata.full_name || "User"}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">john@example.com</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
                       </div>
                       <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 shrink-0" />
                     </>
@@ -353,14 +358,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@example.com</p>
+                    <p className="text-sm font-medium">{user.user_metadata.full_name || "User"}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" />
